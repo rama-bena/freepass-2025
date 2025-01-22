@@ -3,7 +3,7 @@
 ### ⚠️⚠️⚠️
 
 ```
-Submissions from 2023 students will have much higher priority than submissions from 2022, SAP, or higher students.
+Submissions from 2024 students will have much higher priority than submissions from 2023, SAP, or higher students.
 Please take note of this before planning to attempt this freepass challenge.
 ```
 
