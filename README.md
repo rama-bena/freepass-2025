@@ -171,7 +171,7 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 
 ## **📞** Contact
 
-Have any questions? You can contact either [Vinncent](https://www.instagram.com/centwong_) or [Izra](https://www.instagram.com/izrarya).
+Have any questions? You can contact either [Tyo](https://www.instagram.com/nandanatyo/) or [Ilham](https://www.instagram.com/iilham_akbar/).
 
 ## **🎁** Submission
 
