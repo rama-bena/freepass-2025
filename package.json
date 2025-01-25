@@ -1,0 +1,27 @@
+{
+  "name": "freepass-2025",
+  "version": "1.0.0",
+  "description": "frepass-backend-bcc-2025",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "start:dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rama-bena/freepass-2025.git"
+  },
+  "author": "ramabena.rb@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rama-bena/freepass-2025/issues"
+  },
+  "homepage": "https://github.com/rama-bena/freepass-2025#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.3",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5"
+  }
+}
