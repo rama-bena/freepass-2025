@@ -148,7 +148,7 @@ You might be overwhelmed by these requirements. Don't worry, here's a list of so
 > **Any code that did not follow the convention will be rejected!**
 >
 > 1. Golang (preferred)
-> 2. Java (preferred)
+> 2. Java
 > 3. NodeJS
 > 4. PHP
 
