@@ -2,9 +2,10 @@
   "name": "freepass-2025",
   "version": "1.0.0",
   "description": "frepass-backend-bcc-2025",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app.js",
+    "start:dev": "nodemon src/app.js"
   },
   "repository": {
     "type": "git",
