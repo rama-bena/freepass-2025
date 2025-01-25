@@ -1,8 +1,8 @@
 # BCC University
 
-### ⚠️⚠️⚠️
+⚠️⚠️⚠️
 
-```
+```txt
 Submissions from 2024 students will have much higher priority than submissions from 2023, SAP, or higher students.
 Please take note of this before planning to attempt this freepass challenge.
 ```
@@ -39,7 +39,7 @@ As we have mentioned earlier, we need technology that can support BCC Conference
 
 ## **🌎** Service Implementation
 
-```
+```txt
 GIVEN => I am a new user
 WHEN  => I register to the system
 THEN  => System will record and return the user's registration details
@@ -156,7 +156,7 @@ You are welcome to use any libraries or frameworks, but we appreciate if you use
 
 ## **🎒** Tasks
 
-```
+```txt
 The implementation of this project MUST be in the form of a REST, gRPC, or GraphQL API (choose AT LEAST one type).
 ```
 
@@ -167,7 +167,42 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 
 ## **🧪** API Installation
 
-> Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
+### Prerequisites
+
+- Node.js (v23.x or later) // not tested with lower version
+- npm (v10.x or later)
+
+### Steps
+
+1. **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/rama-bena/freepass-2025.git
+    ```
+
+    ```bash
+    cd freepass-2025
+    ```
+
+2. **Install dependencies:**
+
+    ```bash
+    npm install
+    ```
+
+3. **Run the application:**
+
+    ```bash
+    npm start
+    ```
+
+4. **Access the API:**
+
+    The API will be running at `http://localhost:3000`.
+
+### Additional Notes
+
+- Use tools like `Postman` or `thunder client` to test the API endpoints.
 
 ## **📞** Contact
 
