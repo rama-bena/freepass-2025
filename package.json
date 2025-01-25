@@ -1,0 +1,22 @@
+{
+  "name": "freepass-2025",
+  "version": "1.0.0",
+  "description": "frepass-backend-bcc-2025",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rama-bena/freepass-2025.git"
+  },
+  "author": "ramabena.rb@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rama-bena/freepass-2025/issues"
+  },
+  "homepage": "https://github.com/rama-bena/freepass-2025#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
