@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '15m' });
 };
 
 export async function registerUser(req, res) {
@@ -35,18 +35,28 @@ export async function loginUser(req, res) {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (user && (await user.matchPassword(password))) {
-      return res.json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        token: generateToken(user._id),
+    if (!user || !(await user.matchPassword(password))) {
+      return res.status(400).json({
+        error: 'INVALID',
+        message: 'email or password wrong',
       });
-    } else {
-      return res
-        .status(400)
-        .json({ error: 'INVALID', message: 'Invalid credentials' });
     }
+
+    const token = generateToken(user._id);
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Hanya digunakan di HTTPS
+      sameSite: 'Strict', // Cegah pengiriman cookie lintas situs
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+
+    return res.json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    });
   } catch (err) {
     return res.status(500).json({
       error: 'LOGIN_FAILED',
@@ -56,15 +66,13 @@ export async function loginUser(req, res) {
 }
 
 export async function logoutUser(req, res) {
+  res.cookie('token', '', { maxAge: 1 });
   return res.json({ message: 'User logged out successfully' });
 }
 
 export const getUsers = async (req, res) => {
   try {
-    const decoded = jwt.verify(
-      req.headers.authorization.split(' ')[1],
-      process.env.JWT_SECRET,
-    );
+    const decoded = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
     const adminUser = await User.findById(decoded.id);
     if (adminUser.role !== 'admin') {
       return res
