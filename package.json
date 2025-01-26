@@ -5,19 +5,15 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node src/server.js",
-    "start:dev": "nodemon src/server.js"
+    "start": "node .",
+    "start:dev": "nodemon ."
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rama-bena/freepass-2025.git"
   },
-  "author": "ramabena.rb@gmail.com",
+  "author": "ramabena ramabena.rb@gmail.com",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/rama-bena/freepass-2025/issues"
-  },
-  "homepage": "https://github.com/rama-bena/freepass-2025#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
