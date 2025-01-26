@@ -1,25 +1,87 @@
+import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 
-async function registerUser(req, res) {
-  const { username, password, email } = req.body;
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+};
+
+export async function registerUser(req, res) {
+  const { username, email, password, role } = req.body;
   try {
-    const user = new User({ username, password, email });
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res
+        .status(409)
+        .json({ error: 'CONFLICT', message: 'User already exists' });
+    }
+
+    const user = new User({ username, password, email, role });
     await user.save();
-    res.status(201).json(user);
+    return res.status(201).json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    return res.status(500).json({
+      error: 'INTERNAL_SERVICE_ERROR',
+      message: 'register not success: ' + err.message,
+    });
   }
 }
 
-async function loginUser(req, res) {
-  const { username, password } = req.body;
+export async function loginUser(req, res) {
+  const { email, password } = req.body;
   try {
-    const user = await User.findOne({ username, password });
-    if (!user) return res.status(400).json({ error: 'Invalid credentials' });
-    res.json(user);
+    const user = await User.findOne({ email });
+    if (user && (await user.matchPassword(password))) {
+      return res.json({
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        token: generateToken(user._id),
+      });
+    } else {
+      return res
+        .status(400)
+        .json({ error: 'INVALID', message: 'Invalid credentials' });
+    }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({
+      error: 'LOGIN_FAILED',
+      message: 'login not success: ' + err.message,
+    });
   }
 }
 
-export { registerUser, loginUser };
+export async function logoutUser(req, res) {
+  return res.json({ message: 'User logged out successfully' });
+}
+
+export const getUsers = async (req, res) => {
+  try {
+    const decoded = jwt.verify(
+      req.headers.authorization.split(' ')[1],
+      process.env.JWT_SECRET,
+    );
+    const adminUser = await User.findById(decoded.id);
+    if (adminUser.role !== 'admin') {
+      return res
+        .status(403)
+        .json({ error: 'ADMIN_ONLY', message: 'Forbidden: Admins only' });
+    }
+
+    const users = await User.find({});
+    const usersWithoutPassword = users.map((user) => {
+      // eslint-disable-next-line no-unused-vars
+      const { password, ...userWithoutPassword } = user.toObject();
+      return userWithoutPassword;
+    });
+    return res.json(usersWithoutPassword);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: 'INTERNAL_SERVICE_ERROR', message: err.message });
+  }
+};
