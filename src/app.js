@@ -1,12 +1,15 @@
-const express = require('express');
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import connectDB from './config/dbConfig.js';
+import userRoutes from './routes/userRoutes.js';
+
 const app = express();
-const authRoutes = require('../routes/authRoute');
-const state = {
-    "port": 3000
-}
 
-app.use('/api/auth', authRoutes);
+app.use(express.json());
+app.use(cookieParser());
 
-app.listen(state.port, () => {
-    console.log(`App listening at http://localhost:${state.port}`);
-});
+app.use('/api/users', userRoutes);
+
+connectDB();
+
+export default app;
