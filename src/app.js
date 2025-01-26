@@ -1,12 +1,11 @@
-const express = require('express');
+import express from 'express';
+import authRoutes from '../routes/authRoute.js';
+
 const app = express();
-const authRoutes = require('../routes/authRoute');
-const state = {
-    "port": 3000
-}
+const PORT = 3000;
 
 app.use('/api/auth', authRoutes);
 
-app.listen(state.port, () => {
-    console.log(`App listening at http://localhost:${state.port}`);
+app.listen(PORT, () => {
+  console.log(`App listening at http://localhost:${PORT}`);
 });
