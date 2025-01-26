@@ -190,13 +190,20 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
     npm install
     ```
 
-3. **Run the application:**
+3. **TODO: Configure database**
+
+4. **Edit `.env` file**
+
+    - Copy file `.env.example` and rename it `.env`.
+    - Edit the configuration to your configuration
+
+5. **Run the application:**
 
     ```bash
     npm start
     ```
 
-4. **Access the API:**
+6. **Access the API:**
 
     The API will be running at `http://localhost:3000`.
 
