@@ -16,7 +16,43 @@ async function registerUser() {
     const data = await response.json();
     if (response.status === 201) {
         alert('Registration successful!');
-        fetchUsers();
+        window.location.href = 'index.html';
+    } else {
+        alert(`Error: ${data.message}`);
+    }
+}
+
+async function loginUser() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include'
+    });
+
+    const data = await response.json();
+    if (response.status === 200) {
+        window.location.href = 'main.html';
+    } else {
+        alert(`Error: ${data.message}`);
+    }
+}
+
+async function logoutUser() {
+    const response = await fetch(`${API_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include'
+    });
+
+    const data = await response.json();
+    if (response.status === 200) {
+        alert('Logout successful!');
+        window.location.href = 'index.html';
     } else {
         alert(`Error: ${data.message}`);
     }
@@ -40,5 +76,3 @@ async function fetchUsers() {
         userList.appendChild(userItem);
     });
 }
-
-document.addEventListener('DOMContentLoaded', fetchUsers);
