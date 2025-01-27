@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node .",
-    "start:dev": "nodemon .",
+    "start:server": "nodemon .",
+    "start:fe": "cd sampleapp/ && npm start",
     "startAll": "cross-env ./script/start-all.sh"
   },
   "repository": {

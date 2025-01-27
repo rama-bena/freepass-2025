@@ -1,5 +1,5 @@
 #!/bin/bash
 
-nodemon . &
+node . &
 cd sampleApp
 npm start
