@@ -6,6 +6,7 @@ import {
   logoutUser,
   getUsers,
   getUserProfile,
+  updateUserProfile,
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -15,5 +16,6 @@ router.post('/login', loginUser);
 router.post('/logout', authenticateUser, logoutUser);
 router.get('/', authenticateUser, getUsers);
 router.get('/:username', authenticateUser, getUserProfile);
+router.put('/profile', authenticateUser, updateUserProfile);
 
 export default router;

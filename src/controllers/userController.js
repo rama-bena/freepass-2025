@@ -109,3 +109,37 @@ export async function getUserProfile(req, res) {
     });
   }
 }
+
+export async function updateUserProfile(req, res) {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findById(req.user._id);
+    const userExists = await User.findOne({ username });
+
+    if (userExists && userExists._id.toString() !== user._id.toString()) {
+      return res.status(HttpStatusCode.CONFLICT).json({
+        error: ResponseError.CONFLICT,
+        message: 'Username already exists',
+      });
+    }
+
+    user.username = username || user.username;
+    if (password) {
+      res.cookie('token', '', config.cookie.logout);
+      user.password = password;
+    }
+
+    await user.save();
+    return res.json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (err) {
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      error: ResponseError.INTERNAL_SERVER_ERROR,
+      message: 'Error updating user profile: ' + err.message,
+    });
+  }
+}

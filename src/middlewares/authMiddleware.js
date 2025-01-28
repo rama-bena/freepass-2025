@@ -15,11 +15,17 @@ export const authenticateUser = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, config.jwt.secret);
     req.user = await User.findById(decoded.id).select('-password');
+    if(!req.user) {
+      return res.status(HttpStatusCode.UNAUTHORIZED).json({
+        error: ResponseError.UNAUTHORIZED,
+        message: 'Not authorized, no user',
+      });
+    }
     next();
   } catch (err) {
     return res.status(HttpStatusCode.UNAUTHORIZED).json({
       error: ResponseError.UNAUTHORIZED,
-      message: 'Not authorized, token failed ' + err.message,
+      message: 'Not authorized: ' + err.message,
     });
   }
 };
