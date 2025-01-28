@@ -19,7 +19,7 @@ export const protect = async (req, res, next) => {
   } catch (err) {
     return res.status(HttpStatusCode.UNAUTHORIZED).json({
       error: ResponseError.UNAUTHORIZED,
-      message: 'Not authorized, token failed',
+      message: 'Not authorized, token failed ' + err.message,
     });
   }
 };

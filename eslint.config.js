@@ -10,6 +10,7 @@ export default [
       quotes: ['error', 'single'],
       semi: ['error', 'always'],
       'no-unused-vars': 'warn',
+      'no-undef': 'off',
     },
   },
 ];
