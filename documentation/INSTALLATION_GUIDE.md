@@ -23,7 +23,7 @@
     npm install
     ```
 
-3. **TODO: Configure database**
+3. **TODO: Configure database, i'm using mongodb**
 
 4. **Edit `.env` file**
 
@@ -38,7 +38,7 @@
 
 6. **Access the API:**
 
-    The API will be running at `http://localhost:3000`.
+    The API will be running at `http://localhost:3000`. Documentation about API is available in *TODO*
 
 ## Additional Notes
 
