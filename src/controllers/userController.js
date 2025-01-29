@@ -81,13 +81,8 @@ export const getUsers = async (req, res) => {
       });
     }
 
-    const users = await User.find({});
-    const usersWithoutPassword = users.map((user) => {
-      // eslint-disable-next-line no-unused-vars
-      const { password, ...userWithoutPassword } = user.toObject();
-      return userWithoutPassword;
-    });
-    return res.json(usersWithoutPassword);
+    const users = await User.find({}).select('-password');
+    return res.json(users);
   } catch (err) {
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
       error: ResponseError.INTERNAL_SERVER_ERROR,
@@ -95,3 +90,56 @@ export const getUsers = async (req, res) => {
     });
   }
 };
+
+export async function getUserProfile(req, res) {
+  const { username } = req.params;
+  try {
+    const user = await User.findOne({ username }).select('-password');
+    if (!user) {
+      return res.status(HttpStatusCode.NOT_FOUND).json({
+        error: ResponseError.NOT_FOUND,
+        message: 'User not found',
+      });
+    }
+    return res.json(user);
+  } catch (err) {
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      error: ResponseError.INTERNAL_SERVER_ERROR,
+      message: 'Error retrieving user profile: ' + err.message,
+    });
+  }
+}
+
+export async function updateUserProfile(req, res) {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findById(req.user._id);
+    const userExists = await User.findOne({ username });
+
+    if (userExists && userExists._id.toString() !== user._id.toString()) {
+      return res.status(HttpStatusCode.CONFLICT).json({
+        error: ResponseError.CONFLICT,
+        message: 'Username already exists',
+      });
+    }
+
+    user.username = username || user.username;
+    if (password) {
+      res.cookie('token', '', config.cookie.logout);
+      user.password = password;
+    }
+
+    await user.save();
+    return res.json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (err) {
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      error: ResponseError.INTERNAL_SERVER_ERROR,
+      message: 'Error updating user profile: ' + err.message,
+    });
+  }
+}

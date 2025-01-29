@@ -5,22 +5,19 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node src/server.js",
-    "start:dev": "nodemon src/server.js"
+    "start": "node .",
+    "start:dev": "nodemon .",
+    "format:check": "eslint .",
+    "format:fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rama-bena/freepass-2025.git"
   },
-  "author": "ramabena.rb@gmail.com",
+  "author": "ramabena ramabena.rb@gmail.com",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/rama-bena/freepass-2025/issues"
-  },
-  "homepage": "https://github.com/rama-bena/freepass-2025#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -28,8 +25,8 @@
     "mongoose": "^8.9.5"
   },
   "devDependencies": {
+    "@eslint/js": "^9.19.0",
     "eslint": "^9.19.0",
-    "prettier": "^3.4.2",
-    "prettier-eslint": "^16.3.0"
+    "nodemon": "^3.1.9"
   }
 }

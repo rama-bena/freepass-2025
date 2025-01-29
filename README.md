@@ -1,5 +1,7 @@
 # BCC University
 
+Quick link: [Installation guide](documentation/INSTALLATION_GUIDE.md).
+
 ⚠️⚠️⚠️
 
 ```txt
@@ -143,7 +145,7 @@ You might be overwhelmed by these requirements. Don't worry, here's a list of so
 
 ## **🔪** Accepted Weapons
 
-> BEFORE CHOOSING YOUR LANGUAGE, PLEASE VISIT OUR [CONVENTION](CONVENTION.md) ON THIS PROJECT
+> BEFORE CHOOSING YOUR LANGUAGE, PLEASE VISIT OUR [CONVENTION](documentation/CONVENTION.md) ON THIS PROJECT
 >
 > **Any code that did not follow the convention will be rejected!**
 >
@@ -167,49 +169,7 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 
 ## **🧪** API Installation
 
-### Prerequisites
-
-- Node.js (v23.x or later) // not tested with lower version
-- npm (v10.x or later)
-
-### Steps
-
-1. **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/rama-bena/freepass-2025.git
-    ```
-
-    ```bash
-    cd freepass-2025
-    ```
-
-2. **Install dependencies:**
-
-    ```bash
-    npm install
-    ```
-
-3. **TODO: Configure database**
-
-4. **Edit `.env` file**
-
-    - Copy file `.env.example` and rename it `.env`.
-    - Edit the configuration to your configuration
-
-5. **Run the application:**
-
-    ```bash
-    npm start
-    ```
-
-6. **Access the API:**
-
-    The API will be running at `http://localhost:3000`.
-
-### Additional Notes
-
-- Use tools like `Postman` or `thunder client` to test the API endpoints.
+Please follow the instructions on the [Installation guide](documentation/INSTALLATION_GUIDE.md).
 
 ## **📞** Contact
 
@@ -217,7 +177,7 @@ Have any questions? You can contact either [Tyo](https://www.instagram.com/nanda
 
 ## **🎁** Submission
 
-Please follow the instructions on the [Contributing guide](CONTRIBUTING.md).
+Please follow the instructions on the [Contributing guide](documentation/CONTRIBUTING.md).
 
 ![cheers](https://gifsec.com/wp-content/uploads/2022/10/cheers-gif-11.gif)
 
