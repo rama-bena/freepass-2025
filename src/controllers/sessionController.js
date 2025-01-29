@@ -5,6 +5,7 @@ import {
   HttpStatusCode,
   ResponseError,
   ProposalAction,
+  Role,
 } from '../utils/types.js';
 
 export const getAllSessions = async (req, res) => {
@@ -298,7 +299,7 @@ export const handleSessionProposal = async (req, res) => {
     if (session.status !== SessionStatus.PROPOSAL) {
       logger.warn(`Session ${sessionId} is not in proposal status`);
       return res.status(HttpStatusCode.BAD_REQUEST).json({
-        error: ResponseError.INVALID,
+        error: ResponseError.SESSION_NOT_PROPOSAL,
         message: 'Only session proposals can be updated',
       });
     }
@@ -321,6 +322,106 @@ export const handleSessionProposal = async (req, res) => {
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
       error: ResponseError.INTERNAL_SERVER_ERROR,
       message: `Failed to handle session proposal: ${err.message}`,
+    });
+  }
+};
+
+export const addFeedback = async (req, res) => {
+  const { sessionId } = req.params;
+  const { comment } = req.body;
+  const userId = req.user._id;
+
+  try {
+    const session = await Session.findById(sessionId);
+
+    if (!session) {
+      logger.warn(`Session with ID ${sessionId} not found`);
+      return res.status(HttpStatusCode.NOT_FOUND).json({
+        error: ResponseError.NOT_FOUND,
+        message: 'Session not found',
+      });
+    }
+
+    // Ensure session is not in proposal or rejected status
+    if (
+      session.status === SessionStatus.PROPOSAL ||
+      session.status === SessionStatus.REJECTED
+    ) {
+      logger.warn(`Session ${sessionId} is not available for feedback`);
+      return res.status(HttpStatusCode.BAD_REQUEST).json({
+        error: ResponseError.SESSION_NOT_ACCEPTED,
+        message: 'Session not available for feedback',
+      });
+    }
+
+    const feedback = {
+      user_id: userId,
+      comment: comment,
+    };
+
+    logger.debug(
+      `request addFeedback from ${req.user.username}, to ${session.title}, feedback: ${feedback}`
+    );
+    session.feedbacks.push(feedback);
+    await session.save();
+    logger.debug(`Feedback added successfully: ${feedback}`);
+    return res.json({ message: 'Feedback added successfully' });
+  } catch (err) {
+    logger.error(`Error leaving feedback: ${err.message}`, {
+      error: err.stack,
+    });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      error: ResponseError.INTERNAL_SERVER_ERROR,
+      message: `Failed to leave feedback: ${err.message}`,
+    });
+  }
+};
+
+export const removeFeedback = async (req, res) => {
+  const { sessionId, feedbackId } = req.params;
+
+  try {
+    const session = await Session.findById(sessionId);
+
+    if (!session) {
+      logger.warn(`Session with ID ${sessionId} not found`);
+      return res.status(HttpStatusCode.NOT_FOUND).json({
+        error: ResponseError.NOT_FOUND,
+        message: 'Session not found',
+      });
+    }
+
+    const feedbackIndex = session.feedbacks.findIndex(
+      (feedback) => feedback._id.toString() === feedbackId
+    );
+
+    if (feedbackIndex === -1) {
+      logger.warn(`Feedback with ID ${feedbackId} not found`);
+      return res.status(HttpStatusCode.NOT_FOUND).json({
+        error: ResponseError.NOT_FOUND,
+        message: 'Feedback not found',
+      });
+    }
+
+    if (req.user.role !== Role.EVENT_COORDINATOR) {
+      return res.status(HttpStatusCode.FORBIDDEN).json({
+        error: ResponseError.FORBIDDEN,
+        message: 'You do not have permission to remove feedback',
+      });
+    }
+
+    session.feedbacks.splice(feedbackIndex, 1);
+    await session.save();
+
+    logger.debug(`Feedback removed successfully: ${feedbackId}`);
+    return res.json({ message: 'Feedback removed successfully' });
+  } catch (err) {
+    logger.error(`Error removing feedback: ${err.message}`, {
+      error: err.stack,
+    });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      error: ResponseError.INTERNAL_SERVER_ERROR,
+      message: `Failed to remove feedback: ${err.message}`,
     });
   }
 };
