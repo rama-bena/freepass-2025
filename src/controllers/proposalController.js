@@ -23,6 +23,8 @@ export async function createProposal(req, res) {
         message: 'End time must be after start time',
       });
     }
+
+    // TODO: refactor this to a separate function
     // ensure that the session proposal does not overlap with an existing session
     const overlappingSession = await Session.findOne({
       created_by: userId,

@@ -10,7 +10,7 @@ const getAllSessions = async (req, res) => {
   logger.debug('request getAllSession');
   try {
     const sessions = await Session.find({
-      status: { $in: [SessionStatus.PROPOSAL, SessionStatus.REJECTED] },
+      status: { $nin: [SessionStatus.PROPOSAL, SessionStatus.REJECTED] },
     })
       .populate('created_by', 'username')
       .populate('participants', 'username');
@@ -64,6 +64,7 @@ const registerForSession = async (req, res) => {
       });
     }
 
+    // TODO: refactor this to a separate function
     // Ensure user is not registering for multiple sessions at the same time
     const overlappingSession = await Session.findOne({
       participants: userId,
@@ -89,7 +90,7 @@ const registerForSession = async (req, res) => {
       });
     }
 
-    // ensure session is not full
+    // Ensure session is not full
     if (session.participants.length >= session.maximum_participants) {
       logger.warn(`Session ${sessionId} is full`);
       return res.status(HttpStatusCode.BAD_REQUEST).json({
@@ -113,4 +114,98 @@ const registerForSession = async (req, res) => {
   }
 };
 
-export { getAllSessions, registerForSession };
+// TODO: handle if max_participant edited to be less than current participants
+const editSession = async (req, res) => {
+  logger.debug(`request editSession for session ${req.user.username}`);
+  const { sessionId } = req.params;
+  let { title, description, time_start, time_end, maximum_participants } =
+    req.body;
+  const userId = req.user._id;
+
+  try {
+    const session = await Session.findById(sessionId);
+    if (!session) {
+      logger.warn(`Session with ID ${sessionId} not found`);
+      return res.status(HttpStatusCode.NOT_FOUND).json({
+        error: ResponseError.NOT_FOUND,
+        message: 'Session not found',
+      });
+    }
+
+    // Ensure the user is the creator of the session
+    if (session.created_by.toString() !== userId.toString()) {
+      logger.warn(`User ${userId} is not authorized to edit this session`);
+      return res.status(HttpStatusCode.FORBIDDEN).json({
+        error: ResponseError.FORBIDDEN,
+        message: 'You can only edit your own sessions',
+      });
+    }
+
+    title = title || session.title;
+    description = description || session.description;
+    time_start = time_start || session.time_start;
+    time_end = time_end || session.time_end;
+    maximum_participants = maximum_participants || session.maximum_participants;
+
+    // ensure time end is after time start
+    if (time_end <= time_start) {
+      logger.warn(
+        `User ${req.user.username} attempted to create a proposal with invalid time range`
+      );
+      return res.status(HttpStatusCode.BAD_REQUEST).json({
+        error: ResponseError.BAD_REQUEST,
+        message: 'End time must be after start time',
+      });
+    }
+
+    // TODO: refactor this to a separate function
+    // ensure that the session proposal does not overlap with an existing session
+    const overlappingSession = await Session.findOne({
+      _id: { $ne: sessionId },
+      created_by: userId,
+      $or: [
+        {
+          time_start: { $gte: time_start, $lte: time_end },
+        },
+        {
+          time_end: { $gte: time_start, $lte: time_end },
+        },
+        {
+          time_start: { $lte: time_start },
+          time_end: { $gte: time_end },
+        },
+      ],
+    });
+
+    if (overlappingSession) {
+      logger.warn(
+        `User ${req.user.username} attempted to create a proposal within same time period as existing session`
+      );
+      return res.status(HttpStatusCode.CONFLICT).json({
+        error: ResponseError.SESSION_OVERLAP,
+        message:
+          'A session already exists within the specified time period. Please choose a different time.',
+      });
+    }
+
+    session.title = title;
+    session.description = description;
+    session.time_start = time_start;
+    session.time_end = time_end;
+    session.maximum_participants = maximum_participants;
+
+    await session.save();
+    logger.debug(`Session updated successfully: ${session}`);
+    return res.json({ message: 'Session updated successfully', session });
+  } catch (err) {
+    logger.error(`Error editing session: ${err.message}`, {
+      error: err.stack,
+    });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      error: ResponseError.INTERNAL_SERVER_ERROR,
+      message: `Failed to update session: ${err.message}`,
+    });
+  }
+};
+
+export { getAllSessions, registerForSession, editSession };
