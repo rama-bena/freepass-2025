@@ -23,7 +23,7 @@ const sessionSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: Object.values(SessionStatus),
-      default: SessionStatus.UPCOMING,
+      default: SessionStatus.PROPOSAL,
     },
     created_by: {
       type: mongoose.Schema.Types.ObjectId,

@@ -5,6 +5,7 @@ export const Role = Object.freeze({
 });
 
 export const SessionStatus = Object.freeze({
+  PROPOSAL: 'proposal',
   UPCOMING: 'upcoming',
   ONGOING: 'ongoing',
   COMPLETED: 'completed',
@@ -32,4 +33,3 @@ export const ResponseError = Object.freeze({
   SESSION_OVERLAP: 'SESSION_OVERLAP',
   SESSION_FULL: 'SESSION_FULL',
 });
-

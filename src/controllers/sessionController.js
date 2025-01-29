@@ -7,7 +7,7 @@ import {
 } from '../utils/types.js';
 
 const getAllSessions = async (req, res) => {
-  logger.debug(`request getAllSession from ${req.user.username}`);
+  logger.debug('request getAllSession');
   try {
     const sessions = await Session.find()
       .populate('created_by', 'username')
@@ -63,12 +63,7 @@ const registerForSession = async (req, res) => {
     }
 
     // Ensure user is not registering for multiple sessions at the same time
-    const ONE_HOUR = 3600000;
     const overlappingSession = await Session.findOne({
-      time: {
-        $gte: new Date(session.time.getTime() - ONE_HOUR),
-        $lte: new Date(session.time.getTime() + ONE_HOUR),
-      },
       participants: userId,
       $or: [
         {
