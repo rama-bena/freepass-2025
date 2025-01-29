@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticateUser } from '../middlewares/authMiddleware.js';
+import authenticateUser from '../middlewares/authMiddleware.js';
 import {
   getAllSessions,
   registerForSession,

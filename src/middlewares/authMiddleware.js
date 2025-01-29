@@ -4,7 +4,7 @@ import { HttpStatusCode, ResponseError } from '../utils/types.js';
 import config from '../config/config.js';
 import logger from '../utils/logger.js';
 
-export const authenticateUser = async (req, res, next) => {
+const authenticateUser = async (req, res, next) => {
   const token = req.cookies.token;
   if (!token) {
     logger.warn('Unauthorized access attempt: No token provided');
@@ -26,7 +26,7 @@ export const authenticateUser = async (req, res, next) => {
         message: 'Not authorized, no user',
       });
     }
-    logger.info(`User authenticated: ${req.user.email}`);
+    logger.debug(`User authenticated: ${req.user.email}`);
     next();
   } catch (err) {
     logger.error(`Authentication failed: ${err.message}`, { error: err.stack });
@@ -36,3 +36,5 @@ export const authenticateUser = async (req, res, next) => {
     });
   }
 };
+
+export default authenticateUser;
