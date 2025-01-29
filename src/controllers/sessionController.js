@@ -225,14 +225,16 @@ export const deleteSession = async (req, res) => {
       });
     }
 
-    // Ensure the user is the creator of the session
-    if (session.created_by.toString() !== userId.toString()) {
-      logger.warn(`User ${userId} is not authorized to delete this session`);
-      return res.status(HttpStatusCode.FORBIDDEN).json({
-        error: ResponseError.FORBIDDEN,
-        message: 'You can only delete your own sessions',
-      });
-    }
+    // TODO: refactor: build function to check this session created by current user
+    // Ensure the user is the creator of the session or user is event-coordinator
+    if (req.user.role !== 'event-coordinator')
+      if (session.created_by.toString() !== userId.toString()) {
+        logger.warn(`User ${userId} is not authorized to delete this session`);
+        return res.status(HttpStatusCode.FORBIDDEN).json({
+          error: ResponseError.FORBIDDEN,
+          message: 'You can only delete your own sessions',
+        });
+      }
 
     await session.deleteOne();
     logger.debug('Session deleted successfully');

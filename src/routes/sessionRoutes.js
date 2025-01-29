@@ -15,7 +15,12 @@ const router = express.Router();
 router.get('/', getAllSessions);
 router.post('/:sessionId/register', authenticateUser, registerForSession);
 router.put('/:sessionId', authenticateUser, editSession);
-router.delete('/:sessionId', authenticateUser, deleteSession);
+router.delete(
+  '/:sessionId',
+  authenticateUser,
+  checkUserRole(Role.EVENT_COORDINATOR, Role.USER),
+  deleteSession
+);
 router.get(
   '/proposals',
   authenticateUser,
