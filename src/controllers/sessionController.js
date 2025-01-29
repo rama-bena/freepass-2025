@@ -6,7 +6,7 @@ import {
   ResponseError,
 } from '../utils/types.js';
 
-const getAllSessions = async (req, res) => {
+export const getAllSessions = async (req, res) => {
   logger.debug('request getAllSession');
   try {
     const sessions = await Session.find({
@@ -27,7 +27,7 @@ const getAllSessions = async (req, res) => {
   }
 };
 
-const registerForSession = async (req, res) => {
+export const registerForSession = async (req, res) => {
   logger.debug(`request registerForSession from ${req.user.username}`);
   const { sessionId } = req.params;
   const userId = req.user._id;
@@ -115,7 +115,7 @@ const registerForSession = async (req, res) => {
 };
 
 // TODO: handle if max_participant edited to be less than current participants
-const editSession = async (req, res) => {
+export const editSession = async (req, res) => {
   logger.debug(`request editSession for session ${req.user.username}`);
   const { sessionId } = req.params;
   let { title, description, time_start, time_end, maximum_participants } =
@@ -208,8 +208,10 @@ const editSession = async (req, res) => {
   }
 };
 
-const deleteSession = async (req, res) => {
-  logger.debug(`request deleteSession for session ${req.params.sessionId} by ${req.user.username}`);
+export const deleteSession = async (req, res) => {
+  logger.debug(
+    `request deleteSession for session ${req.params.sessionId} by ${req.user.username}`
+  );
   const { sessionId } = req.params;
   const userId = req.user._id;
 
@@ -246,4 +248,23 @@ const deleteSession = async (req, res) => {
   }
 };
 
-export { getAllSessions, registerForSession, editSession, deleteSession };
+export const getSessionProposals = async (req, res) => {
+  logger.debug(`request getSessionProposals from ${req.user.username}`);
+  try {
+    const sessions = await Session.find({
+      status: SessionStatus.PROPOSAL,
+    })
+      .populate('created_by', 'username')
+      .populate('participants', 'username');
+
+    return res.json(sessions);
+  } catch (err) {
+    logger.error(`Error getSessionProposals: ${err.message}`, {
+      error: err.stack,
+    });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      error: ResponseError.INTERNAL_SERVER_ERROR,
+      message: `Failed to fetch sessions: ${err.message}`,
+    });
+  }
+};
