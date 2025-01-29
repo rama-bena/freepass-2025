@@ -208,4 +208,42 @@ const editSession = async (req, res) => {
   }
 };
 
-export { getAllSessions, registerForSession, editSession };
+const deleteSession = async (req, res) => {
+  logger.debug(`request deleteSession for session ${req.params.sessionId} by ${req.user.username}`);
+  const { sessionId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    const session = await Session.findById(sessionId);
+    if (!session) {
+      logger.warn(`Session with ID ${sessionId} not found`);
+      return res.status(HttpStatusCode.NOT_FOUND).json({
+        error: ResponseError.NOT_FOUND,
+        message: 'Session not found',
+      });
+    }
+
+    // Ensure the user is the creator of the session
+    if (session.created_by.toString() !== userId.toString()) {
+      logger.warn(`User ${userId} is not authorized to delete this session`);
+      return res.status(HttpStatusCode.FORBIDDEN).json({
+        error: ResponseError.FORBIDDEN,
+        message: 'You can only delete your own sessions',
+      });
+    }
+
+    await session.deleteOne();
+    logger.debug('Session deleted successfully');
+    return res.json({ message: 'Session deleted successfully' });
+  } catch (err) {
+    logger.error(`Error deleting session: ${err.message}`, {
+      error: err.stack,
+    });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      error: ResponseError.INTERNAL_SERVER_ERROR,
+      message: `Failed to delete session: ${err.message}`,
+    });
+  }
+};
+
+export { getAllSessions, registerForSession, editSession, deleteSession };
