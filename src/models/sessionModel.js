@@ -17,7 +17,8 @@ const sessionSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
-    time: { type: Date, required: true },
+    time_start: { type: Date, required: true },
+    time_end: { type: Date, required: true },
     maximum_participants: { type: Number, required: true },
     status: {
       type: String,

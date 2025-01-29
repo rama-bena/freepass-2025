@@ -70,6 +70,18 @@ const registerForSession = async (req, res) => {
         $lte: new Date(session.time.getTime() + ONE_HOUR),
       },
       participants: userId,
+      $or: [
+        {
+          time_start: { $gte: session.time_start, $lte: session.time_end },
+        },
+        {
+          time_end: { $gte: session.time_start, $lte: session.time_end },
+        },
+        {
+          time_start: { $lte: session.time_start },
+          time_end: { $gte: session.time_end },
+        },
+      ],
     });
 
     if (overlappingSession) {
