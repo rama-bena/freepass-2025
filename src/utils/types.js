@@ -12,6 +12,11 @@ export const SessionStatus = Object.freeze({
   COMPLETED: 'completed',
 });
 
+export const ProposalAction = Object.freeze({
+  ACCEPT: 'accept',
+  REJECT: 'reject',
+});
+
 export const HttpStatusCode = Object.freeze({
   OK: 200,
   CREATED: 201,

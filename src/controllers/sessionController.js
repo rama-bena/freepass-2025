@@ -4,6 +4,7 @@ import {
   SessionStatus,
   HttpStatusCode,
   ResponseError,
+  ProposalAction,
 } from '../utils/types.js';
 
 export const getAllSessions = async (req, res) => {
@@ -267,6 +268,59 @@ export const getSessionProposals = async (req, res) => {
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
       error: ResponseError.INTERNAL_SERVER_ERROR,
       message: `Failed to fetch sessions: ${err.message}`,
+    });
+  }
+};
+
+export const handleSessionProposal = async (req, res) => {
+  const { sessionId } = req.params;
+  const { action } = req.body;
+
+  if (!Object.values(ProposalAction).includes(action)) {
+    return res.status(HttpStatusCode.BAD_REQUEST).json({
+      error: ResponseError.INVALID,
+      message: 'Invalid action. It should be either "accept" or "reject".',
+    });
+  }
+
+  try {
+    const session = await Session.findById(sessionId);
+
+    if (!session) {
+      logger.warn(`Session with ID ${sessionId} not found`);
+      return res.status(HttpStatusCode.NOT_FOUND).json({
+        error: ResponseError.NOT_FOUND,
+        message: 'Session not found',
+      });
+    }
+
+    // Ensure session is 'proposal' status
+    if (session.status !== SessionStatus.PROPOSAL) {
+      logger.warn(`Session ${sessionId} is not in proposal status`);
+      return res.status(HttpStatusCode.BAD_REQUEST).json({
+        error: ResponseError.INVALID,
+        message: 'Only session proposals can be updated',
+      });
+    }
+
+    if (action === ProposalAction.ACCEPT) {
+      session.status = SessionStatus.UPCOMING;
+      logger.info(`Session ${sessionId} accepted`);
+    } else if (action === ProposalAction.REJECT) {
+      session.status = SessionStatus.REJECTED;
+      logger.info(`Session ${sessionId} rejected`);
+    }
+
+    await session.save();
+
+    return res.json({ message: `Session ${action}ed successfully` });
+  } catch (err) {
+    logger.error(`Error handling session proposal: ${err.message}`, {
+      error: err.stack,
+    });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      error: ResponseError.INTERNAL_SERVER_ERROR,
+      message: `Failed to handle session proposal: ${err.message}`,
     });
   }
 };

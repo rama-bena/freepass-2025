@@ -7,6 +7,7 @@ import {
   editSession,
   deleteSession,
   getSessionProposals,
+  handleSessionProposal,
 } from '../controllers/sessionController.js';
 import { Role } from '../utils/types.js';
 
@@ -26,6 +27,12 @@ router.get(
   authenticateUser,
   checkUserRole([Role.EVENT_COORDINATOR]),
   getSessionProposals
+);
+router.patch(
+  '/:sessionId/proposal',
+  authenticateUser,
+  checkUserRole([Role.EVENT_COORDINATOR]),
+  handleSessionProposal
 );
 
 export default router;
