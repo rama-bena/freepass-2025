@@ -9,7 +9,9 @@ import {
 const getAllSessions = async (req, res) => {
   logger.debug('request getAllSession');
   try {
-    const sessions = await Session.find()
+    const sessions = await Session.find({
+      status: { $in: [SessionStatus.PROPOSAL, SessionStatus.REJECTED] },
+    })
       .populate('created_by', 'username')
       .populate('participants', 'username');
 

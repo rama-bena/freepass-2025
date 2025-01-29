@@ -6,6 +6,7 @@ export const Role = Object.freeze({
 
 export const SessionStatus = Object.freeze({
   PROPOSAL: 'proposal',
+  REJECTED: 'rejected',
   UPCOMING: 'upcoming',
   ONGOING: 'ongoing',
   COMPLETED: 'completed',
