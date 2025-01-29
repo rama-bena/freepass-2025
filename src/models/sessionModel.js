@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { SessionStatus } from '../utils/types';
+import { SessionStatus } from '../utils/types.js';
 
 const feedbackSchema = new mongoose.Schema(
   {

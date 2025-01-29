@@ -106,7 +106,7 @@ export const getUsers = async (req, res) => {
     });
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
       error: ResponseError.INTERNAL_SERVER_ERROR,
-      message: err.message,
+      message: `Error retieving users: ${err.message}`,
     });
   }
 };

@@ -27,5 +27,7 @@ export const ResponseError = Object.freeze({
   INVALID: 'INVALID',
   LOGIN_FAILED: 'LOGIN_FAILED',
   ADMIN_ONLY: 'ADMIN_ONLY',
+  SESSION_OVERLAP: 'SESSION_OVERLAP',
+  SESSION_FULL: 'SESSION_FULL',
 });
 
