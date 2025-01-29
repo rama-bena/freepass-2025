@@ -1,3 +1,9 @@
+const Role = Object.freeze({
+  ADMIN: 'admin',
+  EVENT_COORDINATOR: 'event-coordinator',
+  USER: 'user',
+});
+
 const HttpStatusCode = Object.freeze({
   OK: 200,
   CREATED: 201,
@@ -17,4 +23,4 @@ const ResponseError = Object.freeze({
   ADMIN_ONLY: 'ADMIN_ONLY',
 });
 
-export { HttpStatusCode, ResponseError };
+export { Role, HttpStatusCode, ResponseError };

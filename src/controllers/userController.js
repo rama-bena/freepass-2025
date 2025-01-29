@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
-import { HttpStatusCode, ResponseError } from '../utils/types.js';
+import { Role, HttpStatusCode, ResponseError } from '../utils/types.js';
 import config from '../config/config.js';
 
 const generateToken = (id) => {
@@ -74,7 +74,7 @@ export const getUsers = async (req, res) => {
   try {
     const decoded = jwt.verify(req.cookies.token, config.jwt.secret);
     const adminUser = await User.findById(decoded.id);
-    if (adminUser.role !== 'admin') {
+    if (adminUser.role !== Role.ADMIN) {
       return res.status(HttpStatusCode.FORBIDDEN).json({
         error: ResponseError.ADMIN_ONLY,
         message: 'Forbidden: Admins only',
