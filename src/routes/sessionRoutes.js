@@ -6,6 +6,7 @@ import {
   registerForSession,
   editSession,
   deleteSession,
+  createProposal,
   getSessionProposals,
   handleSessionProposal,
   addFeedback,
@@ -50,5 +51,7 @@ router.delete(
   checkUserRole([Role.EVENT_COORDINATOR]),
   removeFeedback
 );
+
+router.post('/proposal', authenticateUser, createProposal);
 
 export default router;
