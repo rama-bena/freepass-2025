@@ -1,0 +1,21 @@
+name: CodiumAI PR Review
+on:
+  push:
+    branches:
+      - feat/main-features
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run CodiumAI Review
+        uses: CodiumAI/pr-review-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
