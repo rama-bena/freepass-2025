@@ -1,8 +1,5 @@
 name: CodiumAI PR Review
 on:
-  push:
-    branches:
-      - feat/main-features
   pull_request:
     branches:
       - main
