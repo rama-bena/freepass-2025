@@ -9,12 +9,18 @@ import {
 } from '../utils/types.js';
 
 const isValidTime = (time_start, time_end) => {
+  if (typeof time_start === 'string') time_start = new Date(time_start);
+  if (typeof time_end === 'string') time_end = new Date(time_end);
+
   if (
-    !time_start ||
-    !time_end ||
     !(time_start instanceof Date) ||
-    !(time_end instanceof Date)
+    isNaN(time_start.getTime()) ||
+    !(time_end instanceof Date) ||
+    isNaN(time_end.getTime())
   ) {
+    logger.debug(
+      `[isValidTime] Invalid time format ${time_start} - ${time_end}`
+    );
     return false;
   }
 
@@ -24,6 +30,9 @@ const isValidTime = (time_start, time_end) => {
     time_start < new Date() ||
     time_end - time_start >= oneDay
   ) {
+    logger.debug(
+      `[isValidTime] Invalid time range ${time_start} - ${time_end}`
+    );
     return false;
   }
   return true;
