@@ -17,7 +17,13 @@ const isValidTime = (time_start, time_end) => {
   ) {
     return false;
   }
-  if (time_start >= time_end || time_start < new Date()) {
+
+  const oneDay = 24 * 60 * 60 * 1000;
+  if (
+    time_start >= time_end ||
+    time_start < new Date() ||
+    time_end - time_start >= oneDay
+  ) {
     return false;
   }
   return true;
@@ -168,10 +174,14 @@ export const editSession = async (req, res) => {
     description = description || session.description;
     time_start = time_start || session.time_start;
     time_end = time_end || session.time_end;
-    if (maximum_participants && maximum_participants < session.participants.length) {
+    if (
+      maximum_participants &&
+      maximum_participants < session.participants.length
+    ) {
       return res.status(HttpStatusCode.BAD_REQUEST).json({
         error: ResponseError.BAD_REQUEST,
-        message: 'Maximum participants cannot be less than current participants count'
+        message:
+          'Maximum participants cannot be less than current participants count',
       });
     }
     maximum_participants = maximum_participants || session.maximum_participants;
