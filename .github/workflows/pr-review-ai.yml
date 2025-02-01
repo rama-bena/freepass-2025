@@ -8,6 +8,10 @@ jobs:
     name: Run pr agent on every pull request, respond to user comments
     if: ${{ github.event.sender.type != 'Bot' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
