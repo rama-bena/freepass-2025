@@ -1,27 +1,25 @@
-name: qodoAI PR Review
+name: AI PR Review
+
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review, review_requested]
+  issue_comment:
 
 jobs:
-  review:
-    name: Run pr agent on every pull request, respond to user comments
-    if: ${{ github.event.sender.type != 'Bot' }}
+  pr-agent:
+    name: PR Agent
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
       issues: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
 
-      - name: Run qodo-ai Review
+    steps:
+      - name: PR Agent Review
         id: pragent
-        uses: qodo-ai/pr-agent@main
+        uses: Codium-ai/pr-agent@main
         env:
-          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: true
-          GITHUB_ACTION_CONFIG.AUTO_REVIEW: true
-          GITHUB_ACTION_CONFIG.AUTO_IMPROVE: false
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          github_action.auto_review: true
+          github_action.auto_describe: true
+          github_action.auto_improve: false
