@@ -8,6 +8,21 @@ import {
   Role,
 } from '../utils/types.js';
 
+const isValidTime = (time_start, time_end) => {
+  if (
+    !time_start ||
+    !time_end ||
+    !(time_start instanceof Date) ||
+    !(time_end instanceof Date)
+  ) {
+    return false;
+  }
+  if (time_start >= time_end || time_start < new Date()) {
+    return false;
+  }
+  return true;
+};
+
 const findOverlappingSession = async (
   userId,
   time_start,
@@ -161,13 +176,13 @@ export const editSession = async (req, res) => {
     }
     maximum_participants = maximum_participants || session.maximum_participants;
 
-    if (time_end <= time_start) {
+    if (!isValidTime(time_start, time_end)) {
       logger.warn(
-        `User ${req.user.username} attempted to create a proposal with invalid time range`
+        `User ${req.user.username} attempted to edit session with invalid time`
       );
       return res.status(HttpStatusCode.BAD_REQUEST).json({
         error: ResponseError.BAD_REQUEST,
-        message: 'End time must be after start time',
+        message: 'Invalid time range or bad time format',
       });
     }
 
@@ -246,13 +261,13 @@ export async function createProposal(req, res) {
   const userId = req.user._id;
 
   try {
-    if (time_end <= time_start) {
+    if (!isValidTime(time_start, time_end)) {
       logger.warn(
-        `User ${req.user.username} attempted to create a proposal with invalid time range`
+        `User ${req.user.username} attempted to create a proposal with invalid time`
       );
       return res.status(HttpStatusCode.BAD_REQUEST).json({
         error: ResponseError.BAD_REQUEST,
-        message: 'End time must be after start time',
+        message: 'Invalid time range or bad time format',
       });
     }
 
