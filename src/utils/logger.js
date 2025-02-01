@@ -5,17 +5,18 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+const LOG_FILE_NAME = 'app.log';
+const ERROR_FILE_NAME = 'error.log';
 const logDir = path.join(__dirname, '../logs');
+
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
 
-// Stream untuk menulis log ke file
-const logStream = fs.createWriteStream(path.join(logDir, 'app.log'), {
+const logStream = fs.createWriteStream(path.join(logDir, LOG_FILE_NAME), {
   flags: 'a',
 });
-const errorStream = fs.createWriteStream(path.join(logDir, 'error.log'), {
+const errorStream = fs.createWriteStream(path.join(logDir, ERROR_FILE_NAME), {
   flags: 'a',
 });
 
@@ -38,6 +39,7 @@ function logToFile(stream, level, message) {
 
 const logger = {
   debug: function (...args) {
+    if (process.env.NODE_ENV === 'production') return;
     const message = args
       .map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : arg))
       .join(' ');
