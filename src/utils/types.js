@@ -1,4 +1,23 @@
-const HttpStatusCode = Object.freeze({
+export const Role = Object.freeze({
+  ADMIN: 'admin',
+  EVENT_COORDINATOR: 'event-coordinator',
+  USER: 'user',
+});
+
+export const SessionStatus = Object.freeze({
+  PROPOSAL: 'proposal',
+  REJECTED: 'rejected',
+  UPCOMING: 'upcoming',
+  ONGOING: 'ongoing',
+  COMPLETED: 'completed',
+});
+
+export const ProposalAction = Object.freeze({
+  ACCEPT: 'accept',
+  REJECT: 'reject',
+});
+
+export const HttpStatusCode = Object.freeze({
   OK: 200,
   CREATED: 201,
   BAD_REQUEST: 400,
@@ -9,12 +28,16 @@ const HttpStatusCode = Object.freeze({
   INTERNAL_SERVER_ERROR: 500,
 });
 
-const ResponseError = Object.freeze({
+export const ResponseError = Object.freeze({
   CONFLICT: 'CONFLICT',
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
   INVALID: 'INVALID',
+  NOT_FOUND: 'NOT_FOUND',
+  BAD_REQUEST: 'BAD_REQUEST',
   LOGIN_FAILED: 'LOGIN_FAILED',
   ADMIN_ONLY: 'ADMIN_ONLY',
+  SESSION_OVERLAP: 'SESSION_OVERLAP',
+  SESSION_FULL: 'SESSION_FULL',
+  SESSION_NOT_ACCEPTED: 'PROPOSAL_NOT_ACCEPTED',
+  SESSION_NOT_PROPOSAL: 'SESSION_NOT_PROPOSAL',
 });
-
-export { HttpStatusCode, ResponseError };
