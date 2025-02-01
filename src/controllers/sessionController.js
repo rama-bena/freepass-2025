@@ -153,6 +153,12 @@ export const editSession = async (req, res) => {
     description = description || session.description;
     time_start = time_start || session.time_start;
     time_end = time_end || session.time_end;
+    if (maximum_participants && maximum_participants < session.participants.length) {
+      return res.status(HttpStatusCode.BAD_REQUEST).json({
+        error: ResponseError.BAD_REQUEST,
+        message: 'Maximum participants cannot be less than current participants count'
+      });
+    }
     maximum_participants = maximum_participants || session.maximum_participants;
 
     if (time_end <= time_start) {
