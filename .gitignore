@@ -25,3 +25,6 @@ build/
 
 # Optional eslint cache
 .eslintcache
+
+# test
+coverage/
