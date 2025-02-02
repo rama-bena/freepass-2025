@@ -36,7 +36,7 @@ describe('registerUser POST /user/register', () => {
 
     await registerUser(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.CREATED);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         // _id: expect.any(String),
