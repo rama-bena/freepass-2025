@@ -6,15 +6,19 @@
   "type": "module",
   "scripts": {
     "start": "node .",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "start:dev": "nodemon .",
     "format:check": "eslint .",
     "format:fix": "eslint . --fix"
+  },
+  "jest": {
+    "transform": {}
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rama-bena/freepass-2025.git"
   },
-  "author": "ramabena ramabena.rb@gmail.com",
+  "author": "Putu Rama Bena Putra <ramabena.rb@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -27,7 +31,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "babel-jest": "^29.7.0",
     "eslint": "^9.19.0",
+    "jest": "^29.7.0",
+    "mockingoose": "^2.16.2",
     "nodemon": "^3.1.9"
   }
 }
