@@ -12,7 +12,12 @@
     "format:fix": "eslint . --fix"
   },
   "jest": {
-    "transform": {}
+    "transform": {},
+    "coveragePathIgnorePatterns": [
+      "src/config/*",
+      "src/models/*",
+      "src/utils/*"
+    ]
   },
   "repository": {
     "type": "git",

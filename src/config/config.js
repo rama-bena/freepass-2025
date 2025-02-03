@@ -1,7 +1,9 @@
 const config = {
   jwt: {
     expiresIn: '15m',
-    secret: process.env.JWT_SECRET,
+    secret: process.env.NODE_ENV === 'production' 
+      ? process.env.JWT_SECRET || (() => { throw new Error('JWT_SECRET must be set in production'); })()
+      : process.env.JWT_SECRET || 'dev_K8q#mP9$nX5@jL2',
   },
   cookie: {
     login: {
