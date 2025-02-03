@@ -1,7 +1,7 @@
 const config = {
   jwt: {
     expiresIn: '15m',
-    secret: process.env.JWT_SECRET,
+    secret: process.env.JWT_SECRET || 'secret',
   },
   cookie: {
     login: {
