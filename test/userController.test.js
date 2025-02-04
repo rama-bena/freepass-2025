@@ -1,7 +1,22 @@
 import { expect, jest } from '@jest/globals';
-import { registerUser, loginUser } from '../src/controllers/userController';
+import {
+  registerUser,
+  loginUser,
+  logoutUser,
+} from '../src/controllers/userController';
 import User from '../src/models/userModel';
 import { HttpStatusCode, ResponseError, Role } from '../src/utils/types';
+
+jest.mock('../src/config/config.js', () => ({
+  jwt: {
+    secret: 'mockSecret',
+    expiresIn: '1h',
+  },
+  cookie: {
+    login: {},
+    logout: {},
+  },
+}));
 
 describe('registerUser', () => {
   let req, res;
@@ -172,5 +187,36 @@ describe('loginUser', () => {
         message: expect.any(String),
       })
     );
+  });
+});
+
+describe('logoutUser', () => {
+  let req, res;
+
+  beforeEach(() => {
+    req = {
+      user: {
+        _id: 'testUserId',
+      },
+    };
+
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+      cookie: jest.fn(),
+    };
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should logout a user successfully', async () => {
+    await logoutUser(req, res);
+
+    expect(res.cookie).toHaveBeenCalledWith('token', '', expect.any(Object));
+    expect(res.json).toHaveBeenCalledWith({
+      message: expect.any(String),
+    });
   });
 });
