@@ -3,8 +3,7 @@ import { registerUser, loginUser } from '../src/controllers/userController';
 import User from '../src/models/userModel';
 import { HttpStatusCode, ResponseError, Role } from '../src/utils/types';
 
-
-describe('registerUser POST /user/register', () => {
+describe('registerUser', () => {
   let req, res;
 
   beforeEach(() => {
@@ -75,7 +74,7 @@ describe('registerUser POST /user/register', () => {
   });
 });
 
-describe('loginUser POST /user/login', () => {
+describe('loginUser', () => {
   let req, res, user;
 
   beforeEach(() => {
@@ -105,6 +104,7 @@ describe('loginUser POST /user/login', () => {
     jest.restoreAllMocks();
   });
 
+  // TODO: create testcase for role user
   it('should login a user when email and password correct', async () => {
     jest.spyOn(User, 'findOne').mockResolvedValue(user);
     user.matchPassword.mockResolvedValue(true);
@@ -113,12 +113,64 @@ describe('loginUser POST /user/login', () => {
 
     expect(User.findOne).toHaveBeenCalledWith({ email: req.body.email });
     expect(user.matchPassword).toHaveBeenCalledWith(req.body.password);
-    expect(res.cookie).toHaveBeenCalledWith('token', expect.any(String), expect.any(Object));
+    expect(res.cookie).toHaveBeenCalledWith(
+      'token',
+      expect.any(String),
+      expect.any(Object)
+    );
     expect(res.json).toHaveBeenCalledWith({
       _id: user._id,
       username: user.username,
       email: user.email,
       role: user.role,
     });
+  });
+
+  it('should return bad request if email is wrong', async () => {
+    jest.spyOn(User, 'findOne').mockResolvedValue(null);
+
+    await loginUser(req, res);
+
+    expect(User.findOne).toHaveBeenCalledWith({ email: req.body.email });
+    expect(res.cookie).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BAD_REQUEST);
+    expect(res.json).toHaveBeenCalledWith({
+      error: ResponseError.BAD_REQUEST,
+      message: expect.any(String),
+    });
+  });
+
+  it('should return bad request if password is wrong', async () => {
+    jest.spyOn(User, 'findOne').mockResolvedValue(user);
+    user.matchPassword.mockResolvedValue(false);
+
+    await loginUser(req, res);
+
+    expect(User.findOne).toHaveBeenCalledWith({ email: req.body.email });
+    expect(user.matchPassword).toHaveBeenCalledWith(req.body.password);
+    expect(res.cookie).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BAD_REQUEST);
+    expect(res.json).toHaveBeenCalledWith({
+      error: ResponseError.BAD_REQUEST,
+      message: expect.any(String),
+    });
+  });
+
+  it('should handle errors during login', async () => {
+    jest.spyOn(User, 'findOne').mockRejectedValue(new Error('Database error'));
+
+    await loginUser(req, res);
+
+    expect(User.findOne).toHaveBeenCalledWith({ email: req.body.email });
+    expect(res.cookie).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(
+      HttpStatusCode.INTERNAL_SERVER_ERROR
+    );
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: ResponseError.INTERNAL_SERVER_ERROR,
+        message: expect.any(String),
+      })
+    );
   });
 });

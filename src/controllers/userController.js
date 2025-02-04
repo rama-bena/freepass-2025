@@ -51,7 +51,7 @@ export async function loginUser(req, res) {
     if (!user || !(await user.matchPassword(password))) {
       logger.warn(`Invalid login attempt for user: ${email}`);
       return res.status(HttpStatusCode.BAD_REQUEST).json({
-        error: ResponseError.INVALID,
+        error: ResponseError.BAD_REQUEST,
         message: 'Email or password wrong',
       });
     }
@@ -70,7 +70,7 @@ export async function loginUser(req, res) {
       error: err.stack,
     });
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
-      error: ResponseError.LOGIN_FAILED,
+      error: ResponseError.INTERNAL_SERVER_ERROR,
       message: 'Login not successful: ' + err.message,
     });
   }
