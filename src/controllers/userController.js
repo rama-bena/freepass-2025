@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
-import { Role, HttpStatusCode, ResponseError } from '../utils/types.js';
+import { HttpStatusCode, ResponseError } from '../utils/types.js';
 import config from '../config/config.js';
 import logger from '../utils/logger.js';
 
@@ -85,20 +85,8 @@ export async function logoutUser(req, res) {
 
 export const getUsers = async (req, res) => {
   try {
-    const decoded = jwt.verify(req.cookies.token, config.jwt.secret);
-    const adminUser = await User.findById(decoded.id);
-    if (adminUser.role !== Role.ADMIN) {
-      logger.warn(
-        `Unauthorized access attempt to getUsers by user: ${decoded.id}`
-      );
-      return res.status(HttpStatusCode.FORBIDDEN).json({
-        error: ResponseError.ADMIN_ONLY,
-        message: 'Forbidden: Admins only',
-      });
-    }
-
     const users = await User.find({}).select('-password');
-    logger.info(`Admin ${decoded.id} retrieved user list`);
+    logger.info('Users retrieved successfully' + users);
     return res.json(users);
   } catch (err) {
     logger.error(`Error retrieving users: ${err.message}`, {
