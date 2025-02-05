@@ -86,7 +86,7 @@ export async function logoutUser(req, res) {
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find({}).select('-password');
-    logger.info('Users retrieved successfully' + users);
+    logger.info(`Retrieved ${users.length} users successfully`);
     return res.json(users);
   } catch (err) {
     logger.error(`Error retrieving users: ${err.message}`, {
