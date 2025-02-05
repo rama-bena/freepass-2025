@@ -1,10 +1,11 @@
-import { expect, it, jest } from '@jest/globals';
+import { afterEach, expect, it, jest } from '@jest/globals';
 import {
   registerUser,
   loginUser,
   logoutUser,
   getUsers,
   getUserProfile,
+  updateUserProfile,
 } from '../src/controllers/userController';
 import User from '../src/models/userModel';
 import { HttpStatusCode, ResponseError, Role } from '../src/utils/types';
@@ -82,6 +83,7 @@ describe('registerUser', () => {
     expect(res.status).toHaveBeenCalledWith(
       HttpStatusCode.INTERNAL_SERVER_ERROR
     );
+
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         error: ResponseError.INTERNAL_SERVER_ERROR,
@@ -360,6 +362,115 @@ describe('getUserProfile', () => {
     expect(User.findOne).toHaveBeenCalledWith({
       username: req.params.username,
     });
+    expect(res.status).toHaveBeenCalledWith(
+      HttpStatusCode.INTERNAL_SERVER_ERROR
+    );
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: ResponseError.INTERNAL_SERVER_ERROR,
+        message: expect.any(String),
+      })
+    );
+  });
+});
+
+describe('updateUserProfile', () => {
+  let req, res, user;
+
+  beforeEach(() => {
+    req = {
+      body: {
+        username: 'updatedUser',
+        password: 'newPassword123',
+      },
+      user: {
+        _id: 'testUserId',
+      },
+    };
+
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+      cookie: jest.fn(),
+    };
+
+    user = {
+      _id: 'testUserId',
+      username: 'testUser',
+      email: 'test@example.com',
+      save: jest.fn(),
+    };
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should update user profile when only given username', async () => {
+    jest.spyOn(User, 'findById').mockResolvedValue(user);
+    jest.spyOn(User, 'findOne').mockResolvedValue(null);
+    user.save.mockResolvedValue(user);
+    delete req.body.password;
+    await updateUserProfile(req, res);
+
+    expect(User.findById).toHaveBeenCalledWith(req.user._id);
+    expect(User.findOne).toHaveBeenCalledWith({ username: req.body.username });
+    expect(user.save).toHaveBeenCalled();
+    expect(res.cookie).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith({
+      _id: user._id,
+      username: req.body.username,
+      email: user.email,
+      role: user.role,
+    });
+  });
+
+  it('should update user profile when only given password', async () => {
+    jest.spyOn(User, 'findById').mockResolvedValue(user);
+    jest.spyOn(User, 'findOne').mockResolvedValue(null);
+    user.save.mockResolvedValue(user);
+    delete req.body.username;
+
+    await updateUserProfile(req, res);
+
+    expect(User.findById).toHaveBeenCalledWith(req.user._id);
+    expect(User.findOne).toHaveBeenCalledWith({ undefined });
+    expect(user.save).toHaveBeenCalled();
+    expect(res.cookie).toHaveBeenCalledWith('token', '', expect.any(Object));
+    expect(res.json).toHaveBeenCalledWith({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    });
+  });
+
+  it('should return conflict if username already exists', async () => {
+    const existingUser = { _id: 'anotherUserId' };
+    jest.spyOn(User, 'findById').mockResolvedValue(user);
+    jest.spyOn(User, 'findOne').mockResolvedValue(existingUser);
+
+    await updateUserProfile(req, res);
+
+    expect(User.findById).toHaveBeenCalledWith(req.user._id);
+    expect(User.findOne).toHaveBeenCalledWith({ username: req.body.username });
+    expect(res.cookie).not.toHaveBeenCalled();
+    expect(user.save).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.CONFLICT);
+    expect(res.json).toHaveBeenCalledWith({
+      error: ResponseError.CONFLICT,
+      message: expect.any(String),
+    });
+  });
+
+  it('should handle errors during updating profile', async () => {
+    jest.spyOn(User, 'findById').mockRejectedValue(new Error('Database error'));
+
+    await updateUserProfile(req, res);
+
+    expect(User.findById).toHaveBeenCalledWith(req.user._id);
+    expect(res.cookie).not.toHaveBeenCalled();
+    expect(user.save).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(
       HttpStatusCode.INTERNAL_SERVER_ERROR
     );
