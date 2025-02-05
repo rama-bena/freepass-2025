@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
-import { Role, HttpStatusCode, ResponseError } from '../utils/types.js';
+import { HttpStatusCode, ResponseError } from '../utils/types.js';
 import config from '../config/config.js';
 import logger from '../utils/logger.js';
 
@@ -51,7 +51,7 @@ export async function loginUser(req, res) {
     if (!user || !(await user.matchPassword(password))) {
       logger.warn(`Invalid login attempt for user: ${email}`);
       return res.status(HttpStatusCode.BAD_REQUEST).json({
-        error: ResponseError.INVALID,
+        error: ResponseError.BAD_REQUEST,
         message: 'Email or password wrong',
       });
     }
@@ -70,7 +70,7 @@ export async function loginUser(req, res) {
       error: err.stack,
     });
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
-      error: ResponseError.LOGIN_FAILED,
+      error: ResponseError.INTERNAL_SERVER_ERROR,
       message: 'Login not successful: ' + err.message,
     });
   }
@@ -85,20 +85,8 @@ export async function logoutUser(req, res) {
 
 export const getUsers = async (req, res) => {
   try {
-    const decoded = jwt.verify(req.cookies.token, config.jwt.secret);
-    const adminUser = await User.findById(decoded.id);
-    if (adminUser.role !== Role.ADMIN) {
-      logger.warn(
-        `Unauthorized access attempt to getUsers by user: ${decoded.id}`
-      );
-      return res.status(HttpStatusCode.FORBIDDEN).json({
-        error: ResponseError.ADMIN_ONLY,
-        message: 'Forbidden: Admins only',
-      });
-    }
-
     const users = await User.find({}).select('-password');
-    logger.info(`Admin ${decoded.id} retrieved user list`);
+    logger.info(`Retrieved ${users.length} users successfully`);
     return res.json(users);
   } catch (err) {
     logger.error(`Error retrieving users: ${err.message}`, {
