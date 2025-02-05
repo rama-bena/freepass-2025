@@ -3,6 +3,7 @@ import {
   registerUser,
   loginUser,
   logoutUser,
+  getUsers,
 } from '../src/controllers/userController';
 import User from '../src/models/userModel';
 import { HttpStatusCode, ResponseError, Role } from '../src/utils/types';
@@ -218,5 +219,69 @@ describe('logoutUser', () => {
     expect(res.json).toHaveBeenCalledWith({
       message: expect.any(String),
     });
+  });
+});
+
+describe('getUsers', () => {
+  let req, res, users;
+
+  beforeEach(() => {
+    req = {
+      cookies: {
+        token: 'mockToken',
+      },
+    };
+
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    users = [
+      {
+        _id: 'user1',
+        username: 'user1',
+        email: 'user1@example.com',
+        role: Role.USER,
+      },
+      {
+        _id: 'user2',
+        username: 'user2',
+        email: 'user2@example.com',
+        role: Role.USER,
+      },
+    ];
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should return a list of users', async () => {
+    const selectMock = jest.fn().mockResolvedValue(users);
+    jest.spyOn(User, 'find').mockReturnValue({ select: selectMock });
+    await getUsers(req, res);
+
+    expect(User.find).toHaveBeenCalledWith({});
+    expect(res.json).toHaveBeenCalledWith(users);
+  });
+
+  it('should handle errors during fetching users', async () => {
+    jest.spyOn(User, 'find').mockImplementation(() => {
+      throw new Error('Database error');
+    });
+
+    await getUsers(req, res);
+
+    expect(User.find).toHaveBeenCalledWith({});
+    expect(res.status).toHaveBeenCalledWith(
+      HttpStatusCode.INTERNAL_SERVER_ERROR
+    );
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: ResponseError.INTERNAL_SERVER_ERROR,
+        message: expect.any(String),
+      })
+    );
   });
 });
