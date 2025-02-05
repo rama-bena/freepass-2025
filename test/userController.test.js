@@ -1,9 +1,10 @@
-import { expect, jest } from '@jest/globals';
+import { expect, it, jest } from '@jest/globals';
 import {
   registerUser,
   loginUser,
   logoutUser,
   getUsers,
+  getUserProfile,
 } from '../src/controllers/userController';
 import User from '../src/models/userModel';
 import { HttpStatusCode, ResponseError, Role } from '../src/utils/types';
@@ -258,11 +259,14 @@ describe('getUsers', () => {
   });
 
   it('should return a list of users', async () => {
-    const selectMock = jest.fn().mockResolvedValue(users);
-    jest.spyOn(User, 'find').mockReturnValue({ select: selectMock });
+    const UserMock = {
+      select: jest.fn().mockResolvedValue(users),
+    };
+    jest.spyOn(User, 'find').mockReturnValue(UserMock);
     await getUsers(req, res);
 
     expect(User.find).toHaveBeenCalledWith({});
+    expect(UserMock.select).toHaveBeenCalledWith('-password');
     expect(res.json).toHaveBeenCalledWith(users);
   });
 
@@ -274,6 +278,88 @@ describe('getUsers', () => {
     await getUsers(req, res);
 
     expect(User.find).toHaveBeenCalledWith({});
+    expect(res.status).toHaveBeenCalledWith(
+      HttpStatusCode.INTERNAL_SERVER_ERROR
+    );
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: ResponseError.INTERNAL_SERVER_ERROR,
+        message: expect.any(String),
+      })
+    );
+  });
+});
+
+describe('getUserProfile', () => {
+  let req, res, user;
+
+  beforeEach(() => {
+    req = {
+      params: {
+        username: 'testUser',
+      },
+    };
+
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    user = {
+      _id: 'testUserId',
+      username: 'testUser',
+      email: 'test@example.com',
+    };
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should return user profile', async () => {
+    const UserMock = {
+      select: jest.fn().mockResolvedValue(user),
+    };
+    jest.spyOn(User, 'findOne').mockReturnValue(UserMock);
+
+    await getUserProfile(req, res);
+
+    expect(User.findOne).toHaveBeenCalledWith({
+      username: req.params.username,
+    });
+    expect(UserMock.select).toHaveBeenCalledWith('-password');
+    expect(res.json).toHaveBeenCalledWith(user);
+  });
+
+  it('should return not found if user does not exist', async () => {
+    const UserMock = {
+      select: jest.fn().mockResolvedValue(null),
+    };
+    jest.spyOn(User, 'findOne').mockReturnValue(UserMock);
+
+    await getUserProfile(req, res);
+
+    expect(User.findOne).toHaveBeenCalledWith({
+      username: req.params.username,
+    });
+    expect(UserMock.select).toHaveBeenCalledWith('-password');
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.NOT_FOUND);
+    expect(res.json).toHaveBeenCalledWith({
+      error: ResponseError.NOT_FOUND,
+      message: expect.any(String),
+    });
+  });
+
+  it('should handle errors during fetching user profile', async () => {
+    jest.spyOn(User, 'findOne').mockImplementation(() => {
+      throw new Error('Database error');
+    });
+
+    await getUserProfile(req, res);
+
+    expect(User.findOne).toHaveBeenCalledWith({
+      username: req.params.username,
+    });
     expect(res.status).toHaveBeenCalledWith(
       HttpStatusCode.INTERNAL_SERVER_ERROR
     );
