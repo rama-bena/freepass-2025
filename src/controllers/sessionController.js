@@ -83,7 +83,7 @@ const isUserSessionOwner = (session, userId, res) => {
 };
 
 export const getAllSessions = async (req, res) => {
-  logger.debug('request getAllSession');
+  logger.debug('Request to get all sessions');
   try {
     const sessions = await Session.find({
       status: { $nin: [SessionStatus.PROPOSAL, SessionStatus.REJECTED] },
@@ -93,18 +93,18 @@ export const getAllSessions = async (req, res) => {
 
     return res.json(sessions);
   } catch (err) {
-    logger.error(`Error getAllSession: ${err.message}`, {
+    logger.error(`Error getting all sessions: ${err.message}`, {
       error: err.stack,
     });
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
       error: ResponseError.INTERNAL_SERVER_ERROR,
-      message: 'Failed to fetch sessions: ' + err.message,
+      message: `Failed to fetch sessions: ${err.message}`,
     });
   }
 };
 
 export const registerForSession = async (req, res) => {
-  logger.debug(`request registerForSession from ${req.user.username}`);
+  logger.debug(`Request to register for session from ${req.user.username}`);
   const { sessionId } = req.params;
   const userId = req.user._id;
 
@@ -162,13 +162,13 @@ export const registerForSession = async (req, res) => {
     });
     res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
       error: ResponseError.INTERNAL_SERVER_ERROR,
-      message: `Registration failed ${err.message}`,
+      message: `Registration failed: ${err.message}`,
     });
   }
 };
 
 export const editSession = async (req, res) => {
-  logger.debug(`request editSession for session ${req.user.username}`);
+  logger.debug(`Request to edit session from ${req.user.username}`);
   const { sessionId } = req.params;
   let { title, description, time_start, time_end, maximum_participants } =
     req.body;
@@ -232,9 +232,7 @@ export const editSession = async (req, res) => {
     logger.debug(`Session updated successfully: ${session}`);
     return res.json({ message: 'Session updated successfully', session });
   } catch (err) {
-    logger.error(`Error editing session: ${err.message}`, {
-      error: err.stack,
-    });
+    logger.error(`Error editing session: ${err.message}`, { error: err.stack });
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
       error: ResponseError.INTERNAL_SERVER_ERROR,
       message: `Failed to update session: ${err.message}`,
@@ -244,7 +242,7 @@ export const editSession = async (req, res) => {
 
 export const deleteSession = async (req, res) => {
   logger.debug(
-    `request deleteSession for session ${req.params.sessionId} by ${req.user.username}`
+    `Request to delete session ${req.params.sessionId} by ${req.user.username}`
   );
   const { sessionId } = req.params;
   const userId = req.user._id;
@@ -254,7 +252,7 @@ export const deleteSession = async (req, res) => {
     if (!isSessionExists(session, sessionId, res)) return;
 
     if (
-      req.user.role !== 'event-coordinator' &&
+      req.user.role !== Role.EVENT_COORDINATOR &&
       !isUserSessionOwner(session, userId, res)
     )
       return;
@@ -273,7 +271,7 @@ export const deleteSession = async (req, res) => {
   }
 };
 
-export async function createProposal(req, res) {
+export const createProposal = async (req, res) => {
   logger.debug(`Request to create proposal from user: ${req.user.username}`);
   const { title, description, time_start, time_end, maximum_participants } =
     req.body;
@@ -321,29 +319,25 @@ export async function createProposal(req, res) {
   } catch (err) {
     logger.error(
       `Error creating proposal for user ${req.user.username}: ${err.message}`,
-      {
-        error: err.stack,
-      }
+      { error: err.stack }
     );
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
       error: ResponseError.INTERNAL_SERVER_ERROR,
       message: `Error creating session proposal: ${err.message}`,
     });
   }
-}
+};
 
 export const getSessionProposals = async (req, res) => {
-  logger.debug(`request getSessionProposals from ${req.user.username}`);
+  logger.debug(`Request to get session proposals from ${req.user.username}`);
   try {
-    const sessions = await Session.find({
-      status: SessionStatus.PROPOSAL,
-    })
+    const sessions = await Session.find({ status: SessionStatus.PROPOSAL })
       .populate('created_by', 'username')
       .populate('participants', 'username');
 
     return res.json(sessions);
   } catch (err) {
-    logger.error(`Error getSessionProposals: ${err.message}`, {
+    logger.error(`Error getting session proposals: ${err.message}`, {
       error: err.stack,
     });
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
@@ -417,7 +411,7 @@ export const addFeedback = async (req, res) => {
 
     const feedback = { user_id: userId, comment };
     logger.debug(
-      `request addFeedback from ${req.user.username}, to ${session.title}, feedback: ${feedback}`
+      `Request to add feedback from ${req.user.username} to ${session.title}, feedback: ${feedback}`
     );
     session.feedbacks.push(feedback);
     await session.save();
