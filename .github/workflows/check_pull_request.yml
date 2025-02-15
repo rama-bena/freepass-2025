@@ -18,7 +18,7 @@ jobs:
         run: npm ci
 
       - name: Code Lint
-        run: npm run format:check
+        run: npm run format
 
       - name: Test Coverage
         uses: ArtiomTr/jest-coverage-report-action@v2
